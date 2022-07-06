@@ -1,10 +1,14 @@
 ﻿#include "GameScene.h"
 #include "TextureManager.h"
 #include <cassert>
-
+#include"AxisIndicator.h"
+#include"PrimitiveDrawer.h"
 GameScene::GameScene() {}
 
-GameScene::~GameScene() {}
+GameScene::~GameScene() {
+	delete model_;
+	delete debugcamera_;
+}
 
 void GameScene::Initialize() {
 
@@ -12,9 +16,22 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 	debugText_ = DebugText::GetInstance();
+	//画像読み込み
+	texturehandle_ = TextureManager::Load("hadesu.jpg");
+	model_ = Model::Create();
+	worldTransform_.Initialize();
+	viewProjection_.Initialize();
+	debugcamera_ = new DebugCamera(1280, 720);
+	AxisIndicator::GetInstance()->SetVisible(true);
+	AxisIndicator::GetInstance()->SetTargetViewProjection(&debugcamera_->GetViewProjection());
+	PrimitiveDrawer::GetInstance()->SetViewProjection(&debugcamera_->GetViewProjection());
+	
 }
 
-void GameScene::Update() {}
+void GameScene::Update()
+{
+	debugcamera_->Update();
+}
 
 void GameScene::Draw() {
 
@@ -31,6 +48,7 @@ void GameScene::Draw() {
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
+
 	// 深度バッファクリア
 	dxCommon_->ClearDepthBuffer();
 #pragma endregion
@@ -42,7 +60,9 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-
+	//model_->Draw(worldTransform_, viewProjection_, texturehandle_);
+	model_->Draw(worldTransform_, debugcamera_->GetViewProjection(), texturehandle_);
+	PrimitiveDrawer::GetInstance()->DrawLine3d({ 0, 1, 0 }, { 2, 1, 0 }, { 1, 1, 1, 1 });
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion
