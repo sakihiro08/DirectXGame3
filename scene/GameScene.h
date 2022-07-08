@@ -52,6 +52,7 @@ private: // メンバ変数
 	WorldTransform worldTransform_;
 	ViewProjection viewProjection_;
 	DebugCamera* debugcamera_ = nullptr;
+	float	Dtor(float b) { return MathUtility::PI / (180 / b); }
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
